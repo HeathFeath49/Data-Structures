@@ -5,18 +5,7 @@
 //#include <stdlib.h>
 #include <sstream>
 using namespace std;
-/*struct Node {
-  int startPos;
-  int endPos;
-  int stringIndex;
-  
-  Node * next;
-  
-  // constructor
-  Node(int start, int end, int index): startPos(start), endPos(end), 
-                                       stringIndex(index), next(nullptr)
-  { }
-}; */
+
 //struct for lisp data
 struct DataObj {
   stack<int> nums;
@@ -59,6 +48,10 @@ void processExpression(DataObj * data,string expr){
   while(i<expr.length()){
     char c = expr[i];
     //cout<<expr[i]<<endl;
+    //cout<<isspace(expr[i])<<endl;
+    /*if(!isdigit(c)){
+      cout<<"found space"<<endl;
+    }*/
     if(isdigit(c)){
       //get entire num
       onGoNum += c;
@@ -67,20 +60,20 @@ void processExpression(DataObj * data,string expr){
         //i++;
         c=expr[i+1];
         //cout<<"c: "<<c<<endl;
+        cout<<c<<endl;
         if(isdigit(c)){
-          cout<<"num to be added: "<<expr[i+1]<<endl;
-          onGoNum+=expr[i+i];
+          cout<<"num to be added: "<<c<<endl;
+          onGoNum+=c;
           i++;
         }
         else{
           numNotFinished = false;
         }
       }
-      //cout<<"got here";
       int n;
-      cout<<onGoNum<<endl;
       stringstream(onGoNum)>>n;
       data->nums.push(n);
+      onGoNum = ' ';
     }
     else if(isOperator(c)){
       //cout<<c<<" is an operator"<<endl;
@@ -100,8 +93,8 @@ int lisp(string expression){
   DataObj * d = new DataObj();
   processExpression(d,expression);
   cout<<d->nums.top()<<endl;
-  cout<<d->closeParenth<<endl;
-  cout<<d->openParenth<<endl;
+  //cout<<d->closeParenth<<endl;
+  //cout<<d->openParenth<<endl;
   
 };
 
