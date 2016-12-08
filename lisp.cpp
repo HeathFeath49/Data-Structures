@@ -54,25 +54,16 @@ bool isOperator(char c){
 
 int processExpression(DataObj * data,string expr){
   string onGoNum = "";
-  //int num1;
-  //int num2;
   int numForOperator = 0;
   int i = 0;
   while(i<expr.length()){
     char c = expr[i];
-    //cout<<expr[i]<<endl;
-    //cout<<isspace(expr[i])<<endl;
-    /*if(!isdigit(c)){
-      cout<<"found space"<<endl;
-    }*/
     if(isdigit(c)){
       //get entire num
       onGoNum += c;
       bool numNotFinished = true;
       while(numNotFinished){
-        //i++;
         c=expr[i+1];
-        //cout<<"c: "<<c<<endl;
         if(isdigit(c)){
           onGoNum+=c;
           i++;
@@ -88,36 +79,34 @@ int processExpression(DataObj * data,string expr){
       numForOperator++;
     }
     else if(isOperator(c)){
-      //cout<<c<<" is an operator"<<endl;
       data->operators.push(c);
     }
     else if(c == '('){
       data->openParenth++;
+      numForOperator = 0;
     }
     else if(c==')'){
       data->closeParenth++;
-      data->operators.pop();
+      if(data->openParenth == data->closeParenth){
+        numForOperator=0;
+        
+        if(data->nums.size()>1){
+          data->nums.push(runCalc(data));
+        }
+      }
+      else{
+        data->operators.pop();  
+      }
+      
     }
-    
     //keep track of when to operate
     if(numForOperator > 1){
-      int b = runCalc(data);
-      //cout<<b<<endl;
-      data->nums.push(b);
+      data->nums.push(runCalc(data));
       numForOperator--;
     }
-    if(data->openParenth == data->closeParenth){
-      numForOperator=0;
-      if(data->nums.size()>1){
-        cout<<"got here"<<endl;
-        runCalc(data);
-      }
-      return data->nums.top();
-    }
-    
     i++;
   }
-  
+  return data->nums.top();
 }
 
 int lisp(string expression){
@@ -130,17 +119,4 @@ int main() {
    cout<<"Input lisp expression"<<endl;
    getline(cin,input);
    cout<<lisp(input);
-  
 }
-
-//CHECK CONTENTS OF STACKS
-/*while(!nums.empty()){
-  int n = nums.top();
-  cout<<n<<endl;
-  nums.pop();
-}
-while(!operators.empty()){
-  char o = operators.top();
-  cout<<o<<endl;
-  operators.pop();
-}*/
