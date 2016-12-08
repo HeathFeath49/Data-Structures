@@ -16,21 +16,31 @@ struct DataObj {
 
 //function to handle calculations
 //TESTED::PASSED
-int calculate(char op,int num1,int num2){
+int calculate(char op,int numL,int numR){
   if(op == '+'){
-    return num1 + num2;
+    return numL + numR;
   }
   else if(op == '-'){
-    return num1-num2;
+    return numL-numR;
   }
   else if(op == '*'){
-    return num1 * num2;
+    return numL * numR;
   }
   else if(op == '/'){
     //doesn't return doubles
-    return num1 / num2;
+    return numL / numR;
   }
 };
+
+int runCalc(DataObj * d){
+  char op = d->operators.top();
+  int numR = d->nums.top();
+  d->nums.pop();
+  int numL = d->nums.top();
+  d->nums.pop();
+  
+  return calculate(op,numL,numR);
+}
 
 bool isOperator(char c){
   vector<char> validOperators = {'+','-','*','/'};
@@ -42,8 +52,11 @@ bool isOperator(char c){
   return false;
 };
 
-void processExpression(DataObj * data,string expr){
+int processExpression(DataObj * data,string expr){
   string onGoNum = "";
+  //int num1;
+  //int num2;
+  int numForOperator = 0;
   int i = 0;
   while(i<expr.length()){
     char c = expr[i];
@@ -60,9 +73,7 @@ void processExpression(DataObj * data,string expr){
         //i++;
         c=expr[i+1];
         //cout<<"c: "<<c<<endl;
-        cout<<c<<endl;
         if(isdigit(c)){
-          cout<<"num to be added: "<<c<<endl;
           onGoNum+=c;
           i++;
         }
@@ -74,6 +85,7 @@ void processExpression(DataObj * data,string expr){
       stringstream(onGoNum)>>n;
       data->nums.push(n);
       onGoNum = ' ';
+      numForOperator++;
     }
     else if(isOperator(c)){
       //cout<<c<<" is an operator"<<endl;
@@ -84,25 +96,40 @@ void processExpression(DataObj * data,string expr){
     }
     else if(c==')'){
       data->closeParenth++;
+      data->operators.pop();
     }
+    
+    //keep track of when to operate
+    if(numForOperator > 1){
+      int b = runCalc(data);
+      //cout<<b<<endl;
+      data->nums.push(b);
+      numForOperator--;
+    }
+    if(data->openParenth == data->closeParenth){
+      numForOperator=0;
+      if(data->nums.size()>1){
+        cout<<"got here"<<endl;
+        runCalc(data);
+      }
+      return data->nums.top();
+    }
+    
     i++;
   }
+  
 }
 
 int lisp(string expression){
   DataObj * d = new DataObj();
-  processExpression(d,expression);
-  cout<<d->nums.top()<<endl;
-  //cout<<d->closeParenth<<endl;
-  //cout<<d->openParenth<<endl;
-  
+  return processExpression(d,expression);
 };
 
 int main() {
    string input;
    cout<<"Input lisp expression"<<endl;
    getline(cin,input);
-   lisp(input);
+   cout<<lisp(input);
   
 }
 
